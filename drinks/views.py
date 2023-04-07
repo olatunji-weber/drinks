@@ -6,21 +6,27 @@ from rest_framework.response import Response
 from rest_framework import status
 
 @api_view(['GET', 'PUT', 'DELETE'])
-def drink_detail(request, id):
+def drink_detail(request, id, format=None):
     try:
         drink = Drink.objects.get(pk=id)
     except Drink.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-        
+
     if request.method == 'GET':
-        pass
+        serializer = DrinkSerializer(drink)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     elif request.method == 'PUT':
-        pass
+        serializer = DrinkSerializer(drink, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     elif request.method == 'DELETE':
-        pass
+        drink.delete()
+        return Response(status = status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET', 'POST'])
-def drink_list(request):
+def drink_list(request, format=None):
 
     if request.method == 'GET':
         #get all the drinks
@@ -28,7 +34,7 @@ def drink_list(request):
         #Serialize them
         serializer = DrinkSerializer(drinks, many=True)
         #return the json
-        return JsonResponse({"Drinks": serializer.data}, safe=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
     if request.method == 'POST':
         serializer = DrinkSerializer(data = request.data)
