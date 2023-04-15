@@ -18,11 +18,15 @@ from django.contrib import admin
 from django.urls import path
 from drinks import views
 from rest_framework.urlpatterns import format_suffix_patterns
+from django.views.static import serve
+from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('drinks/', views.drink_list),
     path('drinks/<int:id>', views.drink_detail),
+    url(r'^media/(?P<path>.*)$', serve,{'document_root':       settings.MEDIA_ROOT}), 
+    url(r'^static/(?P<path>.*)$', serve,{'document_root': settings.STATIC_ROOT}),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
